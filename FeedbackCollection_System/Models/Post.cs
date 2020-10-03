@@ -16,8 +16,8 @@ namespace FeedbackCollection_System.Models
 
         //User Who Created The Order
         public string CreatedBy { get; set; }
-       // [ForeignKey("CreatedBy")]
-       // public virtual ApplicationUser User { get; set; }
+        [ForeignKey("CreatedBy")]
+        public virtual ApplicationUser User { get; set; }
 
         public DateTime CreatedTime { get; set; }
 

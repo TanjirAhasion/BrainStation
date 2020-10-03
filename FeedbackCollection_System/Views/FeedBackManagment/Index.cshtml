@@ -1,9 +1,32 @@
-﻿@model List<FeedbackCollection_System.Models.Post>
+﻿@*@model List<FeedbackCollection_System.ViewModels.FeedbackManagementVm>*@
+@model FeedbackCollection_System.ViewModels.FeedbackPaging
+@*@model List<FeedbackCollection_System.Models.Post>*@
 
+@using PagedList.Mvc
 @{
     ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+
+
+    .displayNone {
+        display: none !important;
+    }
+
+    .display {
+        display: normal !important;
+    }
+
+    .PaginDesign {
+        margin: 6px;
+        font-size: 15px;
+    }
+</style>
+
+
+<link href="~/Content/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
 <h2>Index</h2>
 
 <div class="card">
@@ -15,65 +38,62 @@
                     <i class="la la-th-list"></i> Feedback Management
                 </h4>
             </div>
-            <div class="col-6">
-                @*@if (@ViewBag.UserType == 1)
-                    {*@
-                <div class=" text-white font-weight-bold">
-                    <button type="button" class="btn btn-success btn-sm" id="btnPostAdd" style="margin-right:5px;">Add Post</button>
-                </div>
-                @*}*@
 
+
+
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-sm-6">
+                    @if (@ViewBag.UserType == 1)
+                    {
+                        <div class=" text-white font-weight-bold">
+                            <button type="button" class="btn btn-success btn-sm" id="btnPostAdd" style="margin-right:5px;">Add Post</button>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="col-sm-6">
+                    <input class="form-control input-sm" placeholder="Search" id="myInput" />
+
+                </div>
             </div>
         </div>
+
+
     </div>
 
-    <div class="table-responsive" style="font-size: 12px">
-        <table class="table table-sm table-bordered table-striped table-hover dataTable " style="white-space:nowrap">
-
-            @*Create Table Header*@
-            <thead class="bg-blue bg-lighten-2">
-                <tr style="color:white;">
-
-                    <th>
-
-                    </th>
-                    <th>
-                        Short Name
-                    </th>
-                    <th>
-                        Order
-                    </th>
-                    <th>
-                        Active
-                    </th>
+    <div class="table-responsive" style="font-size: 12px;margin-top:10px">
+        <input type="hidden" class="form-control input-sm" name="Check" id="Check" value="1" />
+        <table class="table table-sm table-bordered table-striped table-hover datatable" style="white-space:nowrap">
 
 
-                </tr>
-            </thead>
 
             @*create Table Boday*@
-            <tbody>
-                @foreach (var item in Model)
+            <tbody id="srcBody">
+                @foreach (var item in Model.CustomerListPageing)
                 {
-                    <tr id="@item.PostId">
+                    <tr id="@item.PostId" style="background-color:antiquewhite" class="">
                         <td>
                             @Html.DisplayFor(modelItem => item.PostName)
                         </td>
 
                         <td>
+                            @Html.Raw("Admin")
                         </td>
-                             Admin
+
                         <td>
                             @item.CreatedTime
                         </td>
                         <td>
                             @if (@item.Comments.Count > 1)
                             {
-                                @item.Comments.Count @Html.Raw("Comments")
+                                @item.Comments.Count @Html.Raw(" Comments")
                             }
                             else
                             {
-                                @item.Comments.Count @Html.Raw("Comment")
+                                @item.Comments.Count @Html.Raw(" Comment")
                             }
 
                             <a href="#" class="add-comment">Comment</a>
@@ -87,20 +107,101 @@
                             </td>
 
                             <td>
+                                @Html.DisplayFor(modelItem => pp.User.UserName)
                             </td>
 
                             <td>
                                 @pp.CreatedTime
                             </td>
                             <td>
-                                <span class="like-Vote" id="likeVote">@pp.Votes.Count(x => x.VoteType == 1)</span>
-                                <span class="dislike-Vote" id="dislikeVote">@pp.Votes.Count(x => x.VoteType == 2)</span>
+                                <span class="like-Vote" style="color:green"><i class="fas fa-arrow-up"></i> <span id="likeVote_@pp.CommentId"> @pp.Votes.Count(x => x.VoteType == 1) </span> </span>
+                                <span class="dislike-Vote" style="color:red;margin-left:5px"><i class="fas fa-arrow-down"></i> <span id="dislikeVote_@pp.CommentId">@pp.Votes.Count(x => x.VoteType == 2) </span> </span>
                             </td>
                         </tr>
                     }
                 }
             </tbody>
+
+            @*create Table Boday*@
+
+            @*<tbody id="srcBody">
+                    @foreach (var item in Model)
+                    {
+                        <tr id="@item.Posts.PostId" style="background-color:antiquewhite" class="">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Posts.PostName)
+                            </td>
+
+                            <td>
+                                @Html.Raw("Admin")
+                            </td>
+
+                            <td>
+                                @item.Posts.CreatedTime
+                            </td>
+                            <td>
+                                @if (@item.Posts.Comments.Count > 1)
+                                {
+                                    @item.Posts.Comments.Count @Html.Raw(" Comments")
+                                }
+                                else
+                                {
+                                    @item.Posts.Comments.Count @Html.Raw(" Comment")
+                                }
+
+                                <a href="#" class="add-comment">Comment</a>
+                            </td>
+                        </tr>
+
+                        foreach (var pp in item.Posts.Comments)
+                        {
+                            <tr id="@pp.CommentId">
+                                <td>
+                                    @Html.DisplayFor(modelItem => pp.CommmentName)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => pp.User.UserName)
+                                </td>
+
+                                <td>
+                                    @pp.CreatedTime
+                                </td>
+                                <td>
+                                    <span class="like-Vote" style="color:green"><i class="fas fa-arrow-up"></i> <span id="likeVote_@pp.CommentId"> @pp.Votes.Count(x => x.VoteType == 1) </span> </span>
+                                    <span class="dislike-Vote" style="color:red;margin-left:5px"><i class="fas fa-arrow-down"></i> <span id="dislikeVote_@pp.CommentId">@pp.Votes.Count(x => x.VoteType == 2) </span> </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>*@
         </table>
+
+        <div id="listpage" style="padding-left: 22px; padding-top: 10px; width: 100%; float: left;">
+
+
+            @Html.PagedListPager(
+                Model.CustomerListPageing,
+                page => Url.Action("customerList",
+                    new
+                    {
+                        page,
+                        Model.Check
+
+                         }),
+                     new PagedListRenderOptions()
+                     {
+                         LiElementClasses = new List<string> { "PaginDesign" }
+
+                    }),
+            new PagedListRenderOptions()
+            {
+            LiElementClasses = new List<string>
+                { "PaginDesign" }
+
+                })
+
+        </div>
 
     </div>
 </div>
@@ -134,7 +235,6 @@
         </div>
     </div>
 </div>
-
 
 <div id="createEventAddCommentModal" class="modal fade">
     <div class="modal-dialog modal-md">
@@ -178,7 +278,39 @@
 </div>
 
 @section Scripts {
+
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/dataTables.jqueryui.min.js"></script>
     <script type="text/javascript">
+
+        //$(document).ready(function () {
+        //    $('.datatable').DataTable();
+        //});
+
+
+        $("#myInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#srcBody tr").filter(function () {
+                console.log($(this).text());
+
+                //alert($(this).text().toLowerCase().indexOf(value));
+                if ($(this).text().toLowerCase().indexOf(value) > -1) {
+
+                    $(this).addClass("display");
+                    $(this).removeClass("displayNone");
+                }
+                else {
+
+
+                    $(this).removeClass("display");
+                    $(this).addClass("displayNone");
+                }
+
+
+                // $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
         $('#btnPostAdd').click(function () {
 
             $('#createEventModal').modal('show');
@@ -236,7 +368,13 @@
                 data: { "CommentId": trid, "VoteType": 1 },
                 datatype: 'Json',
                 success: function (data) {
-                    window.location.href = '/FeedBackManagment/Index';
+
+                    //console.log(data);]
+
+                    $('#likeVote_' + trid).text(data.like);
+                    $('#dislikeVote_' + trid).text(data.dislike);
+
+                    // window.location.href = '/FeedBackManagment/Index';
                 }
             });
 
@@ -251,7 +389,14 @@
                 data: { "CommentId": trid, "VoteType": 2 },
                 datatype: 'Json',
                 success: function (data) {
-                    window.location.href = '/FeedBackManagment/Index';
+
+                    //console.log(data);
+
+
+                    $('#likeVote_' + trid).text(data.like);
+                    $('#dislikeVote_' + trid).text(data.dislike);
+
+                    //window.location.href = '/FeedBackManagment/Index';
                 }
             });
         })

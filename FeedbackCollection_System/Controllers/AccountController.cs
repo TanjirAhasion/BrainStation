@@ -9,12 +9,14 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using FeedbackCollection_System.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace FeedbackCollection_System.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -79,7 +81,11 @@ namespace FeedbackCollection_System.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+                    string userId = UserManager.FindByName(model.Email)?.Id;
+                    ApplicationUser currentUser = UserManager.FindById(userId);
+                    Session["LoggedUserInfo"] = currentUser;
+                    return RedirectToAction("Index", "FeedBackManagment");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:

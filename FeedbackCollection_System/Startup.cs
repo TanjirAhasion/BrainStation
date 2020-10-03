@@ -29,7 +29,6 @@ namespace FeedbackCollection_System
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
 
-
             // In Startup iam creating first Admin Role and creating a default Admin User     
             if (!roleManager.RoleExists("Admin"))
             {
@@ -42,8 +41,8 @@ namespace FeedbackCollection_System
                 //Here we create a Admin super user who will maintain the website                   
 
                 var user = new ApplicationUser();
-                user.UserName = "shanu";
-                user.Email = "test@gmail.com";
+                user.UserName = "admin";
+                user.Email = "admin@mail.com";
 
                 string userPWD = "Abc@123456";
 
@@ -53,7 +52,6 @@ namespace FeedbackCollection_System
                 if (chkUser.Succeeded)
                 {
                     var result1 = UserManager.AddToRole(user.Id, "Admin");
-
                 }
             }
 
@@ -61,9 +59,38 @@ namespace FeedbackCollection_System
             if (!roleManager.RoleExists("User"))
             {
                 var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                role.Name = "Manager";
+                role.Name = "User";
                 roleManager.Create(role);
 
+
+                var user = new ApplicationUser();
+                user.UserName = "user1";
+                user.Email = "user1@mail.com";
+
+                string userPWD = "Abc@123456";
+
+                var chkUser = UserManager.Create(user, userPWD);
+
+                //Add default User to Role Admin    
+                if (chkUser.Succeeded)
+                {
+                    var result1 = UserManager.AddToRole(user.Id, "User");
+                }
+
+
+                var user2 = new ApplicationUser();
+                user2.UserName = "user1";
+                user2.Email = "user1@mail.com";
+
+                userPWD = "Abc@123456";
+
+                var chkUser2 = UserManager.Create(user2, userPWD);
+
+                //Add default User to Role Admin    
+                if (chkUser2.Succeeded)
+                {
+                    var result1 = UserManager.AddToRole(user2.Id, "User");
+                }
             }
 
 
