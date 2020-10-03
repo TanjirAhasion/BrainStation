@@ -27,6 +27,11 @@ namespace FeedbackCollection_System.ViewModels
 
     public class FeedbackPaging
     {
+         public FeedbackPaging()
+        {
+            Posts = new List<Post>();
+        }
+        
         public List<Post> Posts { get; set; }
 
 
