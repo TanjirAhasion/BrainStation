@@ -1,0 +1,261 @@
+﻿@model List<FeedbackCollection_System.Models.Post>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<div class="card">
+
+    <div class="card-header card-head-inverse bg-blue  bg-lighten-1">
+        <div class="row">
+            <div class="col-12">
+                <h4 class="card-title text-white">
+                    <i class="la la-th-list"></i> Feedback Management
+                </h4>
+            </div>
+            <div class="col-6">
+                @*@if (@ViewBag.UserType == 1)
+                    {*@
+                <div class=" text-white font-weight-bold">
+                    <button type="button" class="btn btn-success btn-sm" id="btnPostAdd" style="margin-right:5px;">Add Post</button>
+                </div>
+                @*}*@
+
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive" style="font-size: 12px">
+        <table class="table table-sm table-bordered table-striped table-hover dataTable " style="white-space:nowrap">
+
+            @*Create Table Header*@
+            <thead class="bg-blue bg-lighten-2">
+                <tr style="color:white;">
+
+                    <th>
+
+                    </th>
+                    <th>
+                        Short Name
+                    </th>
+                    <th>
+                        Order
+                    </th>
+                    <th>
+                        Active
+                    </th>
+
+
+                </tr>
+            </thead>
+
+            @*create Table Boday*@
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="@item.PostId">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PostName)
+                        </td>
+
+                        <td>
+                        </td>
+                             Admin
+                        <td>
+                            @item.CreatedTime
+                        </td>
+                        <td>
+                            @if (@item.Comments.Count > 1)
+                            {
+                                @item.Comments.Count @Html.Raw("Comments")
+                            }
+                            else
+                            {
+                                @item.Comments.Count @Html.Raw("Comment")
+                            }
+
+                            <a href="#" class="add-comment">Comment</a>
+                        </td>
+                    </tr>
+                    foreach (var pp in item.Comments)
+                    {
+                        <tr id="@pp.CommentId">
+                            <td>
+                                @Html.DisplayFor(modelItem => pp.CommmentName)
+                            </td>
+
+                            <td>
+                            </td>
+
+                            <td>
+                                @pp.CreatedTime
+                            </td>
+                            <td>
+                                <span class="like-Vote" id="likeVote">@pp.Votes.Count(x => x.VoteType == 1)</span>
+                                <span class="dislike-Vote" id="dislikeVote">@pp.Votes.Count(x => x.VoteType == 2)</span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div id="createEventModal" class="modal fade">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-info white" style="padding: 8px">
+                <h5 style="font-weight: bold" class="modal-title white">Create Post</h5>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span> <span class="sr-only">close</span></button>
+
+            </div>
+            <div id="modalBody" class="modal-body">
+
+                <div class="form-group">
+                    <div class="col-12">
+                        <div class="form-group row">
+                            <label class="col-4" style="font-weight: bold">Post </label>
+                            <div class=" col-8">
+
+                                <input type="text" class="form-control input-sm" id="PostName" name="Post" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 8px">
+                <button class="btn btn-sm" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                <button type="submit" class="btn btn-success btn-sm" id="submitPostButton">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="createEventAddCommentModal" class="modal fade">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header bg-info white" style="padding: 8px">
+                <h5 style="font-weight: bold" class="modal-title white">Create Comment</h5>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span> <span class="sr-only">close</span></button>
+
+            </div>
+            <div id="modalBody" class="modal-body">
+                <input type="hidden" id="postId" />
+                <div class="form-group">
+                    <div class="col-12">
+                        <div class="form-group row">
+                            <label class="col-4" style="font-weight: bold">Commnet </label>
+                            <div class=" col-8">
+
+                                <input type="text" class="form-control input-sm" id="CommentPostName" name="Post" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-12">
+                        <div class="form-group row">
+                            <label class="col-4" style="font-weight: bold">Post </label>
+                            <div class=" col-8">
+
+                                <input type="text" class="form-control input-sm" id="CommentName" name="Post" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 8px">
+                <button class="btn btn-sm" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                <button type="submit" class="btn btn-success btn-sm" id="submitCommentButton">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $('#btnPostAdd').click(function () {
+
+            $('#createEventModal').modal('show');
+
+        });
+
+        $('#submitPostButton').click(function () {
+
+            $('#createEventModal').modal('show');
+
+            $.ajax({
+                type: 'Get',
+                url: "/FeedBackManagment/CreatePost",
+                contentType: "application/json; charset=utf-8",
+                data: { "Postname": $('#PostName').val() },
+                datatype: 'Json',
+                success: function (data) {
+                    window.location.href = '/FeedBackManagment/Index';
+                }
+            });
+
+        });
+
+        $('.add-comment').click(function () {
+
+            $('#createEventAddCommentModal').modal('show');
+            var trid = $(this).closest('tr').attr('id');
+            let name = $(this).closest('tr').children('td:first').text();
+            $("#postId").val(trid);
+            $("#CommentPostName").val(name);
+
+
+        });
+
+        $('#submitCommentButton').click(function () {
+
+            $.ajax({
+                type: 'Get',
+                url: "/FeedBackManagment/CreateComment",
+                contentType: "application/json; charset=utf-8",
+                data: { "CommmentName": $('#CommentName').val(), "PostId": $('#postId').val() },
+                datatype: 'Json',
+                success: function (data) {
+                    window.location.href = '/FeedBackManagment/Index';
+                }
+            });
+
+        });
+        $('.like-Vote').click(function () {
+            var trid = $(this).closest('tr').attr('id');
+            $.ajax({
+                type: 'Get',
+                url: "/FeedBackManagment/CreateVote",
+                contentType: "application/json; charset=utf-8",
+                data: { "CommentId": trid, "VoteType": 1 },
+                datatype: 'Json',
+                success: function (data) {
+                    window.location.href = '/FeedBackManagment/Index';
+                }
+            });
+
+        })
+
+        $('.dislike-Vote').click(function () {
+            var trid = $(this).closest('tr').attr('id');
+            $.ajax({
+                type: 'Get',
+                url: "/FeedBackManagment/CreateVote",
+                contentType: "application/json; charset=utf-8",
+                data: { "CommentId": trid, "VoteType": 2 },
+                datatype: 'Json',
+                success: function (data) {
+                    window.location.href = '/FeedBackManagment/Index';
+                }
+            });
+        })
+
+
+    </script>
+}
